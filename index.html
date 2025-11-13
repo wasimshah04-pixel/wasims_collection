@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAWVENGERS-X</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet" />
+
+    <!-- Firebase v9 Modular SDK -->
+    <script type="module">
+        // Firebase Modular Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, update, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+        // Your Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAetzlA5XCo3rGQL9zZoZ-GSSUSmxuqsLM",
+            authDomain: "lawvengers-x-233aa.firebaseapp.com",
+            databaseURL: "https://lawvengers-x-233aa-default-rtdb.firebaseio.com",
+            projectId: "lawvengers-x-233aa",
+            storageBucket: "lawvengers-x-233aa.firebasestorage.app",
+            messagingSenderId: "970574600791",
+            appId: "1:970574600791:web:745bb87480a3a377f3e112",
+            measurementId: "G-8G2M1LWYGL"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const messaging = getMessaging(app);
+
+        // GLOBAL VARIABLES
+        window._auth = auth;
+        window._db = db;
+        window._messaging = messaging;
+        window._firebaseConfig = firebaseConfig;
+
+        console.log("Firebase Loaded (v9 modular)");
+    </script>
+
+    <style>
+        /* ---------- YOUR FULL CSS WILL GO HERE ---------- */
+        /* আমি PART–2 এ পুরো CSS + BODY UI দেবো */
+    </style>
+
+</head>
+<body>
+
+<!-- 🚀 Splash Screen -->
+<div id="splash-screen">
+    <div class="splash-content">
+        <h1>LAWVENGERS-X</h1>
+        <p>Developed by WASIM SHAH</p>
+    </div>
+</div>
+
+<!-- 🟦 Login Screen -->
+<div id="login-screen">
+    <div class="login-container">
+        <h2 id="form-title">Login</h2>
+        <input type="email" id="email-input" placeholder="Email Address" />
+        <input type="password" id="password-input" placeholder="Password" />
+        <button id="auth-btn">Login</button>
+        <p id="login-error"></p>
+        <p id="toggle-form" class="toggle-form">Don't have an account? Sign Up</p>
+    </div>
+</div>
+
+<!-- 🟩 App Main Container -->
+<div id="app-container" style="display:none;">
+    <header id="app-header">
+        <canvas id="bg-canvas"></canvas>
+        <div class="header-top">
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙</button>
+            <h1 class="main-title">LAWVENGERS-X</h1>
+            <button id="logout-btn">Logout</button>
+        </div>
+        <p class="department">DEPARTMENT OF LAW & LAND ADMINISTRATION</p>
+        <p class="university">UNIVERSITY OF RAJSHAHI</p>
+    </header>
+
+    <main>
+        <!-- HOME SCREEN -->
+        <section id="home-screen" class="screen active">
+            <div class="welcome-message">
+                <h2 id="user-greeting">Welcome!</h2>
+                <p>Your central hub for all academic updates.</p>
+            </div>
+
+            <h3 class="section-title">Latest Updates</h3>
+            <div class="latest-updates-container" id="latest-updates"></div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card" data-screen="class-notice-screen">Class Notice</div>
+                <div class="dashboard-card" data-screen="extra-notice-screen">Other Notices</div>
+                <div class="dashboard-card" data-screen="resource-screen">Resources</div>
+                <div class="dashboard-card" data-screen="teachers-screen">Teachers List</div>
+                <div class="dashboard-card" data-screen="discussion-hub-screen">Discussion Hub</div>
+            </div>
+        </section>
+<style>
+
+/* Root Colors */
+:root {
+    --primary-color: #0d1b4c;
+    --secondary-color: #3f51b5;
+    --accent-color: #ffc107;
+    --background-color: #f4f6f9;
+    --text-color: #333;
+    --light-text: #fff;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* Dark Mode */
+body.dark-mode {
+    --primary-color: #1a1a2e;
+    --secondary-color: #16213e;
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --card-bg: #1e1e1e;
+    --shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Global reset */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: .3s;
+}
+
+/* Splash Screen */
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--primary-color);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    color:white;
+    transition: .5s;
+}
+#splash-screen.hidden { opacity:0; pointer-events:none; }
+
+/* Login Screen */
+#login-screen {
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+.login-container {
+    width:100%;
+    max-width:400px;
+    background:var(--card-bg);
+    padding:25px;
+    border-radius:15px;
+    box-shadow:var(--shadow);
+}
+.login-container h2 { text-align:center; margin-bottom:20px; }
+.login-container input {
+    width:100%;
+    padding:12px;
+    margin-bottom:12px;
+    border-radius:8px;
+    border:1px solid #ddd;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+.login-container button {
+    width:100%;
+    padding:12px;
+    border:none;
+    background:var(--primary-color);
+    color:white;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+.toggle-form {
+    text-align:center;
+    margin-top:12px;
+    cursor:pointer;
+    color:var(--secondary-color);
+}
+
+/* App Header */
+#app-header {
+    background:linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding:25px 20px;
+    color:white;
+    text-align:center;
+    border-bottom-left-radius:35px;
+    border-bottom-right-radius:35px;
+    position:relative;
+}
+#bg-canvas {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    opacity:0.15;
+}
+
+/* Dashboard */
+.dashboard-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-top:20px;
+}
+.dashboard-card {
+    padding:20px;
+    background:var(--card-bg);
+    border-radius:15px;
+    text-align:center;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    font-weight:600;
+    transition:.2s;
+}
+.dashboard-card:hover {
+    transform:scale(1.03);
+}
+
+/* Screens */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* Notice Cards */
+.notice-card {
+    background:var(--card-bg);
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+    border-left:5px solid var(--secondary-color);
+}
+
+/* Resource Cards */
+.resource-card {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:15px;
+    background:var(--card-bg);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    margin-bottom:12px;
+}
+
+/* Teachers */
+.teacher-card {
+    display:flex;
+    gap:12px;
+    padding:15px;
+    background:var(--card-bg);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    margin-bottom:12px;
+}
+.teacher-card img {
+    width:70px; height:70px;
+    border-radius:50%;
+    border:3px solid var(--accent-color);
+}
+
+/* Discussion Hub */
+#discussion-messages-container {
+    height: calc(100vh - 260px);
+    overflow-y:auto;
+    background:#eaeaea;
+    padding:10px;
+    border-radius:12px;
+}
+.message-bubble {
+    max-width:80%;
+    padding:10px 15px;
+    margin-bottom:10px;
+    background:var(--card-bg);
+    border-radius:15px;
+    box-shadow:var(--shadow);
+}
+.own-message {
+    background:var(--primary-color);
+    color:white;
+    margin-left:auto;
+}
+
+/* Input */
+.message-input-container {
+    display:flex;
+    gap:10px;
+    background:var(--card-bg);
+    padding:10px;
+    border-radius:12px;
+}
+#message-input {
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--text-color);
+}
+#send-message-btn {
+    background:var(--primary-color);
+    color:white;
+    border:none;
+    padding:0 20px;
+    border-radius:10px;
+}
+
+</style>
+
+
+<!-- Screens continue -->
+<section id="class-notice-screen" class="screen">
+    <h2>Class Notices</h2>
+    <input id="class-notice-search" class="search-bar" placeholder="Search notices...">
+    <div id="class-notice-list"></div>
+</section>
+
+<section id="extra-notice-screen" class="screen">
+    <h2>Other Notices</h2>
+    <input id="extra-notice-search" class="search-bar" placeholder="Search...">
+    <div id="extra-notice-list"></div>
+</section>
+
+<section id="resource-screen" class="screen">
+    <h2>Resources</h2>
+    <input id="resource-search" class="search-bar" placeholder="Search resources...">
+    <div id="resource-list"></div>
+</section>
+
+<section id="teachers-screen" class="screen">
+    <h2>Teachers</h2>
+    <input id="teacher-search" class="search-bar" placeholder="Search teachers...">
+    <div id="teachers-list"></div>
+</section>
+
+<section id="discussion-hub-screen" class="screen">
+    <h2>Discussion Hub</h2>
+    <div id="discussion-messages-container"></div>
+    <div class="message-input-container">
+        <input id="message-input" placeholder="Type message...">
+        <button id="send-message-btn">Send</button>
+    </div>
+</section>
+<script type="module">
+
+// Firebase Imports (আগে load করা হয়েছে)
+import {
+    getAuth, signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, signOut,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+    getDatabase, ref, set, push, onValue, update, remove, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import {
+    getMessaging, getToken, onMessage,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+// ---------- FIREBASE CONFIG ----------
+const firebaseConfig = {
+    apiKey: "AIzaSyAetzlA5XCo3rGQL9zZoZ-GSSUSmxuqsLM",
+    authDomain: "lawvengers-x-233aa.firebaseapp.com",
+    databaseURL: "https://lawvengers-x-233aa-default-rtdb.firebaseio.com",
+    projectId: "lawvengers-x-233aa",
+    storageBucket: "lawvengers-x-233aa.firebasestorage.app",
+    messagingSenderId: "970574600791",
+    appId: "1:970574600791:web:745bb87480a3a377f3e112",
+    measurementId: "G-8G2M1LWYGL"
+};
+
+// ---------- INIT ----------
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const messaging = getMessaging(app);
+
+console.log("Firebase initialized");
+
+// ---------- DOM ----------
+const loginScreen = document.getElementById("login-screen");
+const appContainer = document.getElementById("app-container");
+const emailInput = document.getElementById("email-input");
+const passwordInput = document.getElementById("password-input");
+const authBtn = document.getElementById("auth-btn");
+const toggleForm = document.getElementById("toggle-form");
+const loginError = document.getElementById("login-error");
+
+const logoutBtn = document.getElementById("logout-btn");
+const userGreeting = document.getElementById("user-greeting");
+
+// ---------- Splash Screen ----------
+setTimeout(() => {
+    document.getElementById("splash-screen").classList.add("hidden");
+}, 2200);
+
+// ---------- Auth Toggle ----------
+let isLogin = true;
+
+toggleForm.onclick = () => {
+    isLogin = !isLogin;
+    document.getElementById("form-title").textContent = isLogin ? "Login" : "Sign Up";
+    authBtn.textContent = isLogin ? "Login" : "Sign Up";
+    toggleForm.textContent = isLogin
+        ? "Don't have an account? Sign Up"
+        : "Already have an account? Login";
+    loginError.textContent = "";
+};
+
+// ---------- LOGIN / SIGNUP ----------
+authBtn.onclick = async () => {
+    const email = emailInput.value;
+    const pass = passwordInput.value;
+
+    try {
+        loginError.textContent = "";
+        if (isLogin) {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } else {
+            await createUserWithEmailAndPassword(auth, email, pass);
+        }
+    } catch (err) {
+        loginError.textContent = err.message;
+    }
+};
+
+// ---------- LOGOUT ----------
+logoutBtn.onclick = () => signOut(auth);
+
+// ---------- ON AUTH STATE CHANGE ----------
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        loginScreen.style.display = "none";
+        appContainer.style.display = "block";
+        userGreeting.textContent = `Welcome, ${user.email.split("@")[0]}`;
+
+        setupMessaging(user);
+        loadNotices();
+        loadResources();
+        loadTeachers();
+        loadDiscussion();
+
+    } else {
+        loginScreen.style.display = "flex";
+        appContainer.style.display = "none";
+    }
+});
+
+// ---------- FCM Messaging ----------
+async function setupMessaging(user) {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") return;
+
+        const vapidKey = "REPLACE_WITH_YOUR_VAPID_KEY";
+
+        const token = await getToken(messaging, { vapidKey });
+
+        if (token) {
+            await set(ref(db, "tokens/" + user.uid), token);
+            console.log("FCM Token:", token);
+        }
+
+        // Foreground notification listener
+        onMessage(messaging, (payload) => {
+            alert("🔔 New Notification: " + payload.notification.title);
+        });
+
+    } catch (err) {
+        console.log("FCM Error:", err);
+    }
+}
+
+// ---------- SCREEN SWITCH ----------
+const screens = document.querySelectorAll(".screen");
+document.querySelectorAll(".dashboard-card").forEach(btn => {
+    btn.onclick = () => {
+        const target = btn.dataset.screen;
+        screens.forEach(s => s.classList.remove("active"));
+        document.getElementById(target).classList.add("active");
+    };
+});
+
+// ---------- NOTICES ----------
+function loadNotices() {
+    const classBox = document.getElementById("class-notice-list");
+    const extraBox = document.getElementById("extra-notice-list");
+
+    onValue(ref(db, "notices"), (snap) => {
+        classBox.innerHTML = "";
+        extraBox.innerHTML = "";
+
+        snap.forEach(child => {
+            const d = child.val();
+            const html = `
+                <div class="notice-card">
+                    <h3>${d.title}</h3>
+                    <p>${d.content}</p>
+                    <small>${d.date}</small>
+                </div>
+            `;
+            if (d.type === "Class") classBox.innerHTML += html;
+            else extraBox.innerHTML += html;
+        });
+    });
+}
+
+// ---------- RESOURCES ----------
+function loadResources() {
+    const box = document.getElementById("resource-list");
+
+    onValue(ref(db, "resources"), snap => {
+        box.innerHTML = "";
+        snap.forEach(child => {
+            const d = child.val();
+            box.innerHTML += `
+                <a class="resource-card" href="${d.url}" target="_blank">
+                    <div><b>${d.title}</b></div>
+                    <p>${d.description}</p>
+                </a>
+            `;
+        });
+    });
+}
+
+// ---------- TEACHERS ----------
+function loadTeachers() {
+    const box = document.getElementById("teachers-list");
+
+    onValue(ref(db, "teachers"), snap => {
+        box.innerHTML = "";
+        snap.forEach(child => {
+            const d = child.val();
+            box.innerHTML += `
+                <div class="teacher-card">
+                    <img src="${d.img}">
+                    <div>
+                        <h3>${d.name}</h3>
+                        <p>${d.designation}</p>
+                        <small>${d.email}</small>
+                    </div>
+                </div>
+            `;
+        });
+    });
+}
+
+// ---------- DISCUSSION HUB ----------
+const msgInput = document.getElementById("message-input");
+const msgBtn = document.getElementById("send-message-btn");
+const msgBox = document.getElementById("discussion-messages-container");
+
+msgBtn.onclick = sendMessage;
+msgInput.onkeypress = (e) => { if (e.key === "Enter") sendMessage(); };
+
+function sendMessage() {
+    if (!auth.currentUser) return;
+
+    const text = msgInput.value.trim();
+    if (!text) return;
+
+    push(ref(db, "chat"), {
+        sender: auth.currentUser.email.split("@")[0],
+        senderId: auth.currentUser.uid,
+        text,
+        time: serverTimestamp()
+    });
+
+    msgInput.value = "";
+}
+
+function loadDiscussion() {
+    onValue(ref(db, "chat"), snap => {
+        msgBox.innerHTML = "";
+        snap.forEach(c => {
+            const d = c.val();
+            const isMe = d.senderId === (auth.currentUser?.uid);
+            msgBox.innerHTML += `
+                <div class="message-bubble ${isMe ? "own-message" : ""}">
+                    <b>${d.sender}</b><br>
+                    ${d.text}
+                </div>
+            `;
+        });
+
+        msgBox.scrollTop = msgBox.scrollHeight;
+    });
+}
+
+// ---------- DARK MODE ----------
+document.getElementById("dark-mode-toggle").onclick = () => {
+    document.body.classList.toggle("dark-mode");
+};
+
+</script>
+
+</body>
+</html>
