@@ -471,7 +471,7 @@ async function setupMessaging(user) {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") return;
 
-        const vapidKey = "REPLACE_WITH_YOUR_VAPID_KEY";
+        const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
 
         const token = await getToken(messaging, { vapidKey });
 
