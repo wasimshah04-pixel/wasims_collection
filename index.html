@@ -11,23 +11,19 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- START: FIREBASE SDK -->
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <!-- ADDED: FIREBASE MESSAGING SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
-    <!-- END: FIREBASE SDK -->
 
     <style>
-        /* Your existing CSS code here... */
         :root {
             --primary-color: #0d1b4c; --secondary-color: #3f51b5; --accent-color: #ffc107;
             --background-color: #f4f6f9; --text-color: #333; --light-text-color: #fff;
             --card-bg: #ffffff; --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         
-        /* ডার্ক মোড ভ্যারিয়েবল */
         body.dark-mode {
             --primary-color: #1a1a2e;
             --secondary-color: #16213e;
@@ -40,9 +36,9 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--background-color); color: var(--text-color); -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
+        body { background-color: var(--background-color); color: var(--text-color); -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; overflow-x: hidden; }
         
-        /* === START: নতুন Splash Screen এর জন্য CSS === */
+        /* Splash Screen */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -78,18 +74,11 @@
             pointer-events: none;
         }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        /* === END: Splash Screen CSS === */
 
-        /* === লগইন স্ক্রিন CSS === */
+        /* Login Screen */
         #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .login-container { width: 100%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: var(--shadow); text-align: center; transition: all 0.3s ease; }
         .login-container h2 { color: var(--primary-color); margin-bottom: 25px; }
@@ -98,6 +87,7 @@
         .login-container .toggle-form { margin-top: 20px; font-size: 0.9em; color: var(--secondary-color); cursor: pointer; transition: color 0.3s ease; }
         #login-error { color: #d32f2f; margin-top: 15px; font-size: 0.9em; }
 
+        /* App Container */
         #app-container { max-width: 500px; margin: 0 auto; background: var(--background-color); min-height: 100vh; display: none; }
         #app-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--light-text-color); padding: 30px 20px 25px; text-align: center; position: relative; overflow: hidden; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; transition: all 0.3s ease; }
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; }
@@ -106,10 +96,13 @@
         #app-header .main-title { font-family: 'Roboto Condensed', sans-serif; font-size: 2.3em; font-weight: 700; position: relative; z-index: 1; letter-spacing: 2px; margin-bottom: 8px; color: var(--accent-color); }
         #app-header .department, #app-header .university { position: relative; z-index: 1; font-size: 0.85em; font-weight: 300; letter-spacing: 1px; opacity: 0.9; }
         #app-header .department { font-weight: 400; margin-bottom: 4px; }
+        
         main { padding: 20px; }
         .screen { display: none; animation: fadeIn 0.5s ease-in-out; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Home Screen */
         #home-screen .welcome-message h2 { font-size: 1.8em; font-weight: 600; }
         .section-title { font-size: 1.4em; font-weight: 600; margin-bottom: 15px; color: var(--primary-color); transition: color 0.3s ease; }
         .latest-updates-container { display: flex; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
@@ -119,18 +112,33 @@
         .update-card h3 { font-size: 1em; margin-bottom: 5px; }
         .update-card p { font-size: 0.85em; color: #666; margin-bottom: 10px; transition: color 0.3s ease; }
         .update-card .date { font-size: 0.75em; color: var(--secondary-color); transition: color 0.3s ease; }
+        
         .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
         .dashboard-card { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); padding: 20px; text-align: center; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
         .dashboard-card:hover, .dashboard-card:active { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         .dashboard-card .icon svg { width: 48px; height: 48px; color: var(--primary-color); transition: color 0.3s ease; }
         .dashboard-card p { font-weight: 600; font-size: 1em; }
+        
+        /* Notification Section */
+        .notification-section { margin: 20px 0; text-align: center; }
+        #enable-notifications-btn { background: var(--secondary-color); color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        #enable-notifications-btn:hover { background: var(--primary-color); transform: translateY(-2px); }
+        #enable-notifications-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        
+        /* Page Headers */
         .page-header { display: flex; align-items: center; margin-bottom: 20px; justify-content: space-between; }
         .page-header-title-group { display: flex; align-items: center; }
         .back-btn { background: var(--card-bg); border: none; cursor: pointer; font-size: 1.5em; margin-right: 15px; color: var(--primary-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: all 0.3s ease; }
         .page-header h2 { font-size: 1.8em; font-weight: 600; }
+        
+        /* Notice Cards */
         .notice-card { background: var(--card-bg); border-radius: 10px; box-shadow: var(--shadow); padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--secondary-color); position: relative; transition: all 0.3s ease; }
+        
+        /* Teacher Cards */
         .teacher-card { display: flex; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 15px; box-shadow: var(--shadow); margin-bottom: 15px; position: relative; transition: all 0.3s ease; }
         .teacher-card img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 3px solid var(--accent-color); }
+        
+        /* Resource Cards */
         .resource-card { display: flex; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 15px; box-shadow: var(--shadow); margin-bottom: 15px; text-decoration: none; color: inherit; position: relative; transition: transform 0.2s ease, background-color 0.3s ease; }
         .resource-card:hover { transform: translateY(-3px); }
         .resource-card .resource-icon { margin-right: 15px; }
@@ -138,7 +146,7 @@
         .resource-card .resource-info h3 { font-size: 1.1em; margin-bottom: 3px; }
         .resource-card .resource-info p { font-size: 0.9em; color: #666; transition: color 0.3s ease; }
         
-        /* UPGRADED Discussion Hub CSS */
+        /* Discussion Hub */
         #discussion-messages-container { 
             height: calc(100vh - 280px); 
             overflow-y: auto; 
@@ -170,10 +178,6 @@
             color: var(--light-text-color);
         }
         
-        .own-message .sender {
-            color: var(--accent-color) !important;
-        }
-        
         .message-actions {
             position: absolute;
             top: 5px;
@@ -195,14 +199,6 @@
             padding: 2px 5px;
             border-radius: 50%;
             transition: background-color 0.3s ease;
-        }
-        
-        .own-message .message-options-btn {
-            color: var(--light-text-color);
-        }
-        
-        .message-options-btn:hover {
-            background: rgba(255,255,255,0.2);
         }
         
         .message-options-menu {
@@ -289,6 +285,7 @@
         #message-input { flex-grow: 1; border: none; padding: 10px; font-size: 1em; background: transparent; outline: none; color: var(--text-color); }
         #send-message-btn { background: var(--primary-color); color: var(--light-text-color); border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: background-color 0.3s ease; }
         
+        /* Modals */
         .confirmation-modal {
             position: fixed;
             top: 0;
@@ -338,12 +335,14 @@
             color: #333;
         }
 
+        /* Admin Controls */
         .admin-only { display: none; justify-content: center; align-items: center; }
         .admin-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 2; }
         .admin-btn { background: #e0e0e0; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease; }
         .admin-btn.edit-btn { background-color: #ffc107; color: #333; }
         .admin-btn.delete-btn { background-color: #d32f2f; color: white; }
         .add-new-btn { background: var(--primary-color); color: var(--light-text-color); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; box-shadow: var(--shadow); flex-shrink: 0; transition: background-color 0.3s ease; }
+        
         #admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         #admin-modal-content { background: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; animation: fadeIn 0.3s; transition: background-color 0.3s ease; }
         #admin-modal-content h3 { color: var(--primary-color); margin-bottom: 20px; }
@@ -356,7 +355,7 @@
         #save-admin-data-btn { background: var(--primary-color); color: var(--light-text-color); }
         #cancel-admin-modal-btn { background: #eee; color: #333; }
         
-        /* ডার্ক মোড টগল বাটন */
+        /* Dark Mode Toggle */
         .dark-mode-toggle {
             background: none;
             border: none;
@@ -371,7 +370,7 @@
             transform: scale(1.1);
         }
         
-        /* সার্চ বার স্টাইল */
+        /* Search Bars */
         .search-container {
             margin-bottom: 20px;
             position: relative;
@@ -394,7 +393,7 @@
             box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
         }
         
-        /* লোডিং অ্যানিমেশন */
+        /* Loading States */
         .loading-spinner {
             display: inline-block;
             width: 40px;
@@ -420,25 +419,13 @@
         }
         
         @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
         
-        .skeleton-notice {
-            height: 100px;
-        }
-        
-        .skeleton-resource {
-            height: 80px;
-        }
-        
-        .skeleton-teacher {
-            height: 100px;
-        }
+        .skeleton-notice { height: 100px; }
+        .skeleton-resource { height: 80px; }
+        .skeleton-teacher { height: 100px; }
         
         .no-results {
             text-align: center;
@@ -447,79 +434,6 @@
             font-style: italic;
         }
         
-        /* ডার্ক মোডে কিছু অতিরিক্ত স্টাইল সামঞ্জস্য */
-        body.dark-mode #discussion-messages-container {
-            background: #2c2c2c;
-        }
-        
-        body.dark-mode .message-input-container {
-            background: #2c2c2c;
-        }
-        
-        body.dark-mode .login-container {
-            background: var(--card-bg);
-            color: var(--text-color);
-        }
-        
-        body.dark-mode .login-container input {
-            background: #2c2c2c;
-            color: var(--text-color);
-            border-color: #444;
-        }
-        
-        body.dark-mode .admin-btn {
-            background: #444;
-        }
-        
-        body.dark-mode .login-container .toggle-form {
-            color: var(--accent-color);
-        }
-        
-        body.dark-mode #login-error {
-            color: #f44336;
-        }
-        
-        body.dark-mode .update-card .date {
-            color: var(--accent-color);
-        }
-        
-        body.dark-mode .resource-card .resource-info p {
-            color: #aaa;
-        }
-        
-        body.dark-mode .update-card p {
-            color: #aaa;
-        }
-        
-        body.dark-mode #cancel-admin-modal-btn {
-            background: #444;
-            color: var(--text-color);
-        }
-        
-        body.dark-mode #admin-form input,
-        body.dark-mode #admin-form textarea,
-        body.dark-mode #admin-form select {
-            border-color: #444;
-            background: #2c2c2c;
-        }
-        
-        body.dark-mode .search-bar {
-            background: #2c2c2c;
-            border-color: #444;
-            color: var(--text-color);
-        }
-        
-        body.dark-mode .skeleton-loader {
-            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        }
-        
-        /* হেডার অ্যাকশনস */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         /* Custom Notification Styles */
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -529,45 +443,52 @@
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
         }
-
-        /* Notification Enable Button */
-        .notification-section {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #enable-notifications-btn {
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
+        
+        /* Dark Mode Adjustments */
+        body.dark-mode #discussion-messages-container { background: #2c2c2c; }
+        body.dark-mode .message-input-container { background: #2c2c2c; }
+        body.dark-mode .login-container { background: var(--card-bg); color: var(--text-color); }
+        body.dark-mode .login-container input { background: #2c2c2c; color: var(--text-color); border-color: #444; }
+        body.dark-mode .admin-btn { background: #444; }
+        body.dark-mode .login-container .toggle-form { color: var(--accent-color); }
+        body.dark-mode #login-error { color: #f44336; }
+        body.dark-mode .update-card .date { color: var(--accent-color); }
+        body.dark-mode .resource-card .resource-info p { color: #aaa; }
+        body.dark-mode .update-card p { color: #aaa; }
+        body.dark-mode #cancel-admin-modal-btn { background: #444; color: var(--text-color); }
+        body.dark-mode #admin-form input,
+        body.dark-mode #admin-form textarea,
+        body.dark-mode #admin-form select { border-color: #444; background: #2c2c2c; }
+        body.dark-mode .search-bar { background: #2c2c2c; border-color: #444; color: var(--text-color); }
+        body.dark-mode .skeleton-loader { background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%); }
+        
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        
+        /* Message Sender Name */
+        .message-sender {
+            font-size: 0.8em;
             font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 4px;
+            color: var(--secondary-color);
         }
-
-        #enable-notifications-btn:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
+        
+        .own-message .message-sender {
+            color: rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
 <body>
 
-    <!-- START: নতুন Splash Screen HTML -->
+    <!-- Splash Screen -->
     <div id="splash-screen">
         <div class="splash-content">
             <h1>LAWVENGERS-X</h1>
             <p>Developed by WASIM SHAH</p>
         </div>
     </div>
-    <!-- END: Splash Screen HTML -->
 
-    <!-- === লগইন স্ক্রিন HTML === -->
+    <!-- Login Screen -->
     <div id="login-screen">
         <div class="login-container">
             <h2 id="form-title">Login</h2>
@@ -579,6 +500,7 @@
         </div>
     </div>
 
+    <!-- Main App Container -->
     <div id="app-container">
         <header id="app-header">
             <canvas id="bg-canvas"></canvas>
@@ -592,31 +514,75 @@
         </header>
 
         <main>
-            <!-- সকল স্ক্রিন এখানে -->
+            <!-- Home Screen -->
             <section id="home-screen" class="screen active">
                 <div class="welcome-message">
                     <h2 id="user-greeting">Welcome!</h2>
                     <p>Your central hub for all academic updates.</p>
                 </div>
                 
-                <!-- Notification Enable Button -->
+                <!-- Notification Section -->
                 <div class="notification-section">
                     <button id="enable-notifications-btn">
                         🔔 Enable Notifications
                     </button>
+                    <div id="notification-status" style="margin-top: 10px; font-size: 0.9em; color: #666;"></div>
                 </div>
 
                 <h3 class="section-title">Latest Updates</h3>
                 <div class="latest-updates-container" id="latest-updates"></div>
+                
                 <div class="dashboard-grid">
-                     <div class="dashboard-card" data-screen="class-notice-screen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5-.5H3a.5.5 0 0 1-.5-.5V4z"/></svg></div><p>Class Notice</p></div>
-                    <div class="dashboard-card" data-screen="extra-notice-screen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/></svg></div><p>Other Notices</p></div>
-                    <div class="dashboard-card" data-screen="resource-screen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM4.5 12a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7z"/></svg></div><p>Resources</p></div>
-                    <div class="dashboard-card" data-screen="teachers-screen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg></div><p>Teachers' List</p></div>
-                    <div class="dashboard-card" data-screen="discussion-hub-screen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/></svg></div><p>Discussion Hub</p></div>
+                    <div class="dashboard-card" data-screen="class-notice-screen">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/>
+                                <path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5-.5H3a.5.5 0 0 1-.5-.5V4z"/>
+                            </svg>
+                        </div>
+                        <p>Class Notice</p>
+                    </div>
+                    
+                    <div class="dashboard-card" data-screen="extra-notice-screen">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/>
+                            </svg>
+                        </div>
+                        <p>Other Notices</p>
+                    </div>
+                    
+                    <div class="dashboard-card" data-screen="resource-screen">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM4.5 12a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7z"/>
+                            </svg>
+                        </div>
+                        <p>Resources</p>
+                    </div>
+                    
+                    <div class="dashboard-card" data-screen="teachers-screen">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                            </svg>
+                        </div>
+                        <p>Teachers' List</p>
+                    </div>
+                    
+                    <div class="dashboard-card" data-screen="discussion-hub-screen">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+                            </svg>
+                        </div>
+                        <p>Discussion Hub</p>
+                    </div>
                 </div>
             </section>
 
+            <!-- Other Screens -->
             <section id="class-notice-screen" class="screen">
                 <div class="page-header">
                     <div class="page-header-title-group">
@@ -709,7 +675,7 @@
         </div>
     </div>
 
-    <!-- অ্যাডমিনদের জন্য Modal বা পপ-আপ ফরম -->
+    <!-- Admin Modal -->
     <div id="admin-modal">
         <div id="admin-modal-content">
             <h3 id="admin-modal-title">Add/Edit Data</h3>
@@ -723,8 +689,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- START: নতুন Splash Screen এর জন্য JavaScript ---
+    // --- Splash Screen ---
     const splashScreen = document.getElementById('splash-screen');
     setTimeout(() => {
         splashScreen.classList.add('hidden');
@@ -732,9 +697,8 @@ document.addEventListener('DOMContentLoaded', () => {
             splashScreen.style.display = 'none';
         }, 800);
     }, 2500);
-    // --- END: Splash Screen JavaScript ---
 
-    // --- ডার্ক মোড টগল ফাংশনালিটি ---
+    // --- Dark Mode Toggle ---
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     const currentTheme = localStorage.getItem('darkMode');
     if (currentTheme === 'enabled') {
@@ -756,15 +720,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateThreeJSColor(isDarkMode);
     });
 
-    // --- Firebase কনফিগারেশন ---
+    // --- Firebase Configuration ---
     const firebaseConfig = {
-      apiKey: "AIzaSyAetzlA5XCo3rGQL9zZoZ-GSSUSmxuqsLM",
-      authDomain: "lawvengers-x-233aa.firebaseapp.com",
-      databaseURL: "https://lawvengers-x-233aa-default-rtdb.firebaseio.com",
-      projectId: "lawvengers-x-233aa",
-      storageBucket: "lawvengers-x-233aa.firebasestorage.app",
-      messagingSenderId: "970574600791",
-      appId: "1:970574600791:web:745bb87480a3a377f3e112"
+        apiKey: "AIzaSyAetzlA5XCo3rGQL9zZoZ-GSSUSmxuqsLM",
+        authDomain: "lawvengers-x-233aa.firebaseapp.com",
+        databaseURL: "https://lawvengers-x-233aa-default-rtdb.firebaseio.com",
+        projectId: "lawvengers-x-233aa",
+        storageBucket: "lawvengers-x-233aa.firebasestorage.app",
+        messagingSenderId: "970574600791",
+        appId: "1:970574600791:web:745bb87480a3a377f3e112"
     };
 
     if (!firebase.apps.length) {
@@ -773,57 +737,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = firebase.auth();
     const database = firebase.database();
     
-    // --- START: IMPROVED FCM NOTIFICATION LOGIC ---
+    // --- FCM NOTIFICATION SYSTEM ---
     let messaging = null;
+    const VAPID_KEY = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
 
     function initializeFCM() {
         try {
-            // Check if Firebase messaging is available
-            if (!firebase.messaging) {
-                console.error('Firebase Messaging is not available');
+            if (!firebase.messaging || !firebase.messaging.isSupported()) {
+                console.log('Firebase Messaging is not supported in this environment');
+                updateNotificationStatus('Notifications not supported', 'error');
+                return;
+            }
+            
+            if (!('Notification' in window)) {
+                console.log('This browser does not support notifications');
+                updateNotificationStatus('Browser does not support notifications', 'error');
                 return;
             }
             
             messaging = firebase.messaging();
             
-            // Get the correct VAPID key from Firebase Console
-            const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
-            
-            // Request permission and get token
-            setupNotifications();
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('firebase-messaging-sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered:', registration);
+                        messaging.useServiceWorker(registration);
+                        setupFCM();
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                        // Continue without service worker
+                        setupFCM();
+                    });
+            } else {
+                setupFCM();
+            }
             
         } catch (error) {
             console.error('FCM Initialization failed:', error);
+            updateNotificationStatus('FCM Initialization failed', 'error');
         }
     }
 
-    function setupNotifications() {
+    function setupFCM() {
         if (!messaging) return;
         
-        // Request permission and get token
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-                return getFCMToken();
-            } else {
-                console.log('Unable to get permission to notify.');
-                return null;
-            }
-        }).then((token) => {
-            if (token && currentUser) {
-                // Save token to database
-                database.ref('fcm_tokens/' + currentUser.uid).set(token)
-                    .then(() => {
-                        console.log('FCM token saved to database');
-                        showCustomNotification({
-                            title: 'Notifications Enabled',
-                            body: 'You will now receive important updates!'
-                        });
-                    })
-                    .catch(err => console.error('Error saving FCM token:', err));
-            }
-        }).catch((err) => {
-            console.error('Error getting permission:', err);
+        // Handle token refresh
+        messaging.onTokenRefresh(() => {
+            console.log('FCM token refreshed');
+            getFCMToken().then((token) => {
+                if (token && currentUser) {
+                    database.ref('fcm_tokens/' + currentUser.uid).set(token)
+                        .then(() => console.log('FCM token refreshed in database'))
+                        .catch(err => console.error('Error refreshing FCM token:', err));
+                }
+            });
         });
 
         // Handle foreground messages
@@ -831,25 +800,111 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Foreground message received: ', payload);
             showCustomNotification(payload.notification);
         });
+
+        // Check current notification status
+        updateNotificationUI();
+    }
+
+    function updateNotificationUI() {
+        const statusElement = document.getElementById('notification-status');
+        const button = document.getElementById('enable-notifications-btn');
+        
+        if (!statusElement) return;
+
+        if (Notification.permission === 'granted') {
+            statusElement.textContent = '✅ Notifications are enabled';
+            statusElement.style.color = '#4CAF50';
+            button.textContent = '🔔 Notifications Enabled';
+            button.disabled = true;
+            button.style.background = '#4CAF50';
+        } else if (Notification.permission === 'denied') {
+            statusElement.textContent = '❌ Notifications are blocked. Please enable in browser settings.';
+            statusElement.style.color = '#f44336';
+            button.textContent = '🔕 Notifications Blocked';
+            button.disabled = true;
+            button.style.background = '#f44336';
+        } else {
+            statusElement.textContent = '⚠️ Click to enable notifications';
+            statusElement.style.color = '#ff9800';
+            button.textContent = '🔔 Enable Notifications';
+            button.disabled = false;
+            button.style.background = '';
+        }
+    }
+
+    function updateNotificationStatus(message, type = 'info') {
+        const statusElement = document.getElementById('notification-status');
+        if (!statusElement) return;
+        
+        statusElement.textContent = message;
+        switch(type) {
+            case 'error':
+                statusElement.style.color = '#f44336';
+                break;
+            case 'success':
+                statusElement.style.color = '#4CAF50';
+                break;
+            default:
+                statusElement.style.color = '#ff9800';
+        }
+    }
+
+    function requestNotificationPermission() {
+        if (!messaging) {
+            updateNotificationStatus('Messaging not initialized', 'error');
+            return;
+        }
+
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                updateNotificationStatus('Getting FCM token...', 'info');
+                return getFCMToken();
+            } else {
+                console.log('Unable to get permission to notify.');
+                updateNotificationStatus('Permission denied', 'error');
+                return null;
+            }
+        }).then((token) => {
+            if (token && currentUser) {
+                database.ref('fcm_tokens/' + currentUser.uid).set(token)
+                    .then(() => {
+                        console.log('FCM token saved to database');
+                        updateNotificationUI();
+                        showCustomNotification({
+                            title: 'Notifications Enabled 🔔',
+                            body: 'You will now receive important updates from LAWVENGERS-X!'
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error saving FCM token:', err);
+                        updateNotificationStatus('Error saving token', 'error');
+                    });
+            }
+        }).catch((err) => {
+            console.error('Error getting permission:', err);
+            updateNotificationStatus('Error requesting permission', 'error');
+        });
     }
 
     function getFCMToken() {
         if (!messaging) return Promise.resolve(null);
         
-        const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
-        
-        return messaging.getToken({ vapidKey: vapidKey })
+        return messaging.getToken({ vapidKey: VAPID_KEY })
             .then((currentToken) => {
                 if (currentToken) {
                     console.log('FCM Token:', currentToken);
+                    updateNotificationStatus('Token received successfully', 'success');
                     return currentToken;
                 } else {
                     console.log('No registration token available.');
+                    updateNotificationStatus('No token available', 'error');
                     return null;
                 }
             })
             .catch((err) => {
                 console.log('An error occurred while retrieving token. ', err);
+                updateNotificationStatus('Error getting token', 'error');
                 return null;
             });
     }
@@ -857,7 +912,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showCustomNotification(notification) {
         if (!notification) return;
         
-        // Create a custom in-app notification
         const notificationElement = document.createElement('div');
         notificationElement.style.cssText = `
             position: fixed;
@@ -872,6 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
             z-index: 10000;
             max-width: 300px;
             animation: slideIn 0.3s ease-out;
+            font-family: 'Poppins', sans-serif;
         `;
         
         notificationElement.innerHTML = `
@@ -881,7 +936,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.appendChild(notificationElement);
         
-        // Remove after 5 seconds
         setTimeout(() => {
             if (notificationElement.parentNode) {
                 notificationElement.style.animation = 'slideOut 0.3s ease-in';
@@ -893,8 +947,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 5000);
     }
-    // --- END: IMPROVED FCM NOTIFICATION LOGIC ---
 
+    // --- UI Elements ---
     const loginScreen = document.getElementById('login-screen');
     const appContainer = document.getElementById('app-container');
     const emailInput = document.getElementById('email-input');
@@ -923,6 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
+    // --- App State ---
     let isLoginMode = true;
     let currentUserIsAdmin = false;
     let currentUser = null;
@@ -933,10 +988,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allResources = [];
     let allTeachers = [];
 
-    // Notification enable button event
-    enableNotificationsBtn.addEventListener('click', () => {
-        setupNotifications();
-    });
+    // --- Event Listeners ---
+    enableNotificationsBtn.addEventListener('click', requestNotificationPermission);
 
     toggleFormBtn.addEventListener('click', () => {
         isLoginMode = !isLoginMode;
@@ -965,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     logoutBtn.addEventListener('click', () => {
-        // Remove the user's token on logout
         if(currentUser) {
             database.ref('fcm_tokens/' + currentUser.uid).remove();
         }
@@ -973,6 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUserIsAdmin = false;
     });
 
+    // --- Auth State Management ---
     auth.onAuthStateChanged(user => {
         if (user) {
             loginScreen.style.display = 'none';
@@ -1005,6 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Screen Management ---
     const screens = document.querySelectorAll('.screen');
     function showScreen(screenId) {
         window.scrollTo(0, 0);
@@ -1012,12 +1066,29 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(screenId)?.classList.add('active');
     }
     
+    // Navigation event listeners
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.dashboard-card')) {
+            const screen = e.target.closest('.dashboard-card').dataset.screen;
+            showScreen(screen);
+        } else if (e.target.closest('.back-btn')) {
+            const screen = e.target.closest('.back-btn').dataset.screen;
+            showScreen(screen);
+        }
+    });
+
+    // --- App Logic Initialization ---
     function initializeAppLogic(currentUser) {
+        // Three.js Background Animation
         try {
             const header = document.getElementById('app-header');
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, header.offsetWidth / header.offsetHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+            const renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('bg-canvas'), 
+                alpha: true,
+                antialias: true 
+            });
             renderer.setSize(header.offsetWidth, header.offsetHeight);
             const geometry = new THREE.TorusKnotGeometry( 0.8, 0.25, 100, 16 );
             const material = new THREE.MeshStandardMaterial({ 
@@ -1028,24 +1099,42 @@ document.addEventListener('DOMContentLoaded', () => {
             window.shapeMaterial = material;
             const shape = new THREE.Mesh(geometry, material);
             scene.add(shape);
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambientLight);
-            const pointLight = new THREE.PointLight(0xffffff, 0.7); pointLight.position.set(5, 5, 5); scene.add(pointLight);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); 
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 0.7); 
+            pointLight.position.set(5, 5, 5); 
+            scene.add(pointLight);
             camera.position.z = 3;
+            
             function animateHeader() {
                 requestAnimationFrame(animateHeader);
-                shape.rotation.x += 0.002; shape.rotation.y += 0.002;
+                shape.rotation.x += 0.002; 
+                shape.rotation.y += 0.002;
                 renderer.render(scene, camera);
             }
             animateHeader();
-        } catch (e) { console.error("Three.js failed", e); }
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                renderer.setSize(header.offsetWidth, header.offsetHeight);
+                camera.aspect = header.offsetWidth / header.offsetHeight;
+                camera.updateProjectionMatrix();
+            });
+        } catch (e) { 
+            console.error("Three.js failed", e); 
+        }
 
-        const navButtons = document.querySelectorAll('.dashboard-card, .back-btn');
-        navButtons.forEach(button => button.addEventListener('click', () => showScreen(button.dataset.screen)));
-
+        // Search Functionality
         classNoticeSearch.addEventListener('input', () => filterNotices('class'));
         extraNoticeSearch.addEventListener('input', () => filterNotices('extra'));
         resourceSearch.addEventListener('input', filterResources);
         teacherSearch.addEventListener('input', filterTeachers);
+
+        // Data Population Functions
+        populateNotices();
+        populateResources();
+        populateTeachers();
+        initializeDiscussionHub();
 
         function populateNotices() {
             const noticesRef = database.ref('notices').orderByChild('timestamp');
@@ -1067,12 +1156,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 allNotices.reverse();
 
+                // Update latest updates
                 latestUpdatesContainer.innerHTML = allNotices.slice(0, 5).map(notice => `
                     <div class="update-card" data-notice-id="${notice.key}" data-notice-type="${notice.type || 'Other'}">
                         <h3>${notice.title || 'No Title'}</h3>
                         <p>${(notice.content || '').substring(0, 50)}...</p>
                         <div class="date">${notice.date || 'No Date'}</div>
                     </div>`).join('');
+                
+                // Clear arrays before repopulating
+                allClassNotices = [];
+                allExtraNotices = [];
                 
                 allNotices.forEach(notice => {
                     const adminButtons = currentUserIsAdmin ? `
@@ -1089,9 +1183,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
 
                     if (notice.type === 'Class') {
-                        allClassNotices.push({ key: notice.key, element: noticeCardHTML, title: (notice.title || '').toLowerCase(), content: (notice.content || '').toLowerCase(), date: (notice.date || '').toLowerCase() });
+                        allClassNotices.push({ 
+                            key: notice.key, 
+                            element: noticeCardHTML, 
+                            title: (notice.title || '').toLowerCase(), 
+                            content: (notice.content || '').toLowerCase(), 
+                            date: (notice.date || '').toLowerCase() 
+                        });
                     } else {
-                        allExtraNotices.push({ key: notice.key, element: noticeCardHTML, title: (notice.title || '').toLowerCase(), content: (notice.content || '').toLowerCase(), date: (notice.date || '').toLowerCase() });
+                        allExtraNotices.push({ 
+                            key: notice.key, 
+                            element: noticeCardHTML, 
+                            title: (notice.title || '').toLowerCase(), 
+                            content: (notice.content || '').toLowerCase(), 
+                            date: (notice.date || '').toLowerCase() 
+                        });
                     }
                 });
 
@@ -1107,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resourcesRef.on('value', snapshot => {
                 allResources = [];
                 if (!snapshot.exists()) {
-                    document.getElementById('resource-list').innerHTML = '<p>No resources available.</p>';
+                    document.getElementById('resource-list').innerHTML = '<div class="no-results">No resources available.</div>';
                     return;
                 }
                 
@@ -1117,7 +1223,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         const resource = { key: childSnapshot.key, ...resourceData };
                         const adminButtons = currentUserIsAdmin ? `<div class="admin-controls"><button class="admin-btn edit-btn" data-type="resource" data-key="${resource.key}">✎</button><button class="admin-btn delete-btn" data-type="resource" data-key="${resource.key}">🗑</button></div>` : '';
                         const resourceCardHTML = `<div style="position: relative;">${adminButtons}<a href="${resource.url || '#'}" target="_blank" class="resource-card"><div class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/><path d="M4.5 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/></svg></div><div class="resource-info"><h3>${resource.title || 'No Title'}</h3><p>${resource.description || 'No Description'}</p></div></a></div>`;
-                        allResources.push({ key: resource.key, element: resourceCardHTML, title: (resource.title || '').toLowerCase(), description: (resource.description || '').toLowerCase() });
+                        allResources.push({ 
+                            key: resource.key, 
+                            element: resourceCardHTML, 
+                            title: (resource.title || '').toLowerCase(), 
+                            description: (resource.description || '').toLowerCase() 
+                        });
                     }
                 });
                 displayFilteredResources(allResources);
@@ -1130,13 +1241,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             teachersRef.on('value', snapshot => {
                 allTeachers = [];
+                if (!snapshot.exists()) {
+                    document.getElementById('teachers-list').innerHTML = '<div class="no-results">No teachers available.</div>';
+                    return;
+                }
+                
                 snapshot.forEach(childSnapshot => {
                     const teacherData = childSnapshot.val();
                     if (teacherData) {
                         const teacher = { key: childSnapshot.key, ...teacherData };
                         const adminButtons = currentUserIsAdmin ? `<div class="admin-controls"><button class="admin-btn edit-btn" data-type="teacher" data-key="${teacher.key}">✎</button><button class="admin-btn delete-btn" data-type="teacher" data-key="${teacher.key}">🗑</button></div>` : '';
-                        const teacherCardHTML = `<div class="teacher-card">${adminButtons}<img src="${teacher.img || 'https://via.placeholder.com/70'}" alt="${teacher.name || 'Teacher'}"><div class="teacher-info"><h3>${teacher.name || 'No Name'}</h3><p>${teacher.designation || 'No Designation'}</p><div class="contact-details"><span>✉️ ${teacher.email || 'No Email'}</span><br><span>📞 ${teacher.phone || 'No Phone'}</span></div></div></div>`;
-                        allTeachers.push({ key: teacher.key, element: teacherCardHTML, name: (teacher.name || '').toLowerCase(), designation: (teacher.designation || '').toLowerCase(), email: (teacher.email || '').toLowerCase() });
+                        const teacherCardHTML = `<div class="teacher-card">${adminButtons}<img src="${teacher.img || 'https://via.placeholder.com/70?text=Teacher'}" alt="${teacher.name || 'Teacher'}" onerror="this.src='https://via.placeholder.com/70?text=Teacher'"><div class="teacher-info"><h3>${teacher.name || 'No Name'}</h3><p>${teacher.designation || 'No Designation'}</p><div class="contact-details"><span>✉️ ${teacher.email || 'No Email'}</span><br><span>📞 ${teacher.phone || 'No Phone'}</span></div></div></div>`;
+                        allTeachers.push({ 
+                            key: teacher.key, 
+                            element: teacherCardHTML, 
+                            name: (teacher.name || '').toLowerCase(), 
+                            designation: (teacher.designation || '').toLowerCase(), 
+                            email: (teacher.email || '').toLowerCase() 
+                        });
                     }
                 });
                 displayFilteredTeachers(allTeachers);
@@ -1146,7 +1268,11 @@ document.addEventListener('DOMContentLoaded', () => {
         function filterNotices(type) {
             const searchTerm = (type === 'class' ? classNoticeSearch.value : extraNoticeSearch.value).toLowerCase();
             const notices = type === 'class' ? allClassNotices : allExtraNotices;
-            const filtered = searchTerm ? notices.filter(n => (n.title || '').includes(searchTerm) || (n.content || '').includes(searchTerm) || (n.date || '').includes(searchTerm)) : notices;
+            const filtered = searchTerm ? notices.filter(n => 
+                (n.title || '').includes(searchTerm) || 
+                (n.content || '').includes(searchTerm) || 
+                (n.date || '').includes(searchTerm)
+            ) : notices;
             displayFilteredNotices(type, filtered);
         }
         
@@ -1157,7 +1283,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         function filterResources() {
             const searchTerm = resourceSearch.value.toLowerCase();
-            const filtered = searchTerm ? allResources.filter(r => (r.title || '').includes(searchTerm) || (r.description || '').includes(searchTerm)) : allResources;
+            const filtered = searchTerm ? allResources.filter(r => 
+                (r.title || '').includes(searchTerm) || 
+                (r.description || '').includes(searchTerm)
+            ) : allResources;
             displayFilteredResources(filtered);
         }
         
@@ -1168,7 +1297,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         function filterTeachers() {
             const searchTerm = teacherSearch.value.toLowerCase();
-            const filtered = searchTerm ? allTeachers.filter(t => (t.name || '').includes(searchTerm) || (t.designation || '').includes(searchTerm) || (t.email || '').includes(searchTerm)) : allTeachers;
+            const filtered = searchTerm ? allTeachers.filter(t => 
+                (t.name || '').includes(searchTerm) || 
+                (t.designation || '').includes(searchTerm) || 
+                (t.email || '').includes(searchTerm)
+            ) : allTeachers;
             displayFilteredTeachers(filtered);
         }
         
@@ -1177,138 +1310,137 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = teachers.length === 0 ? '<div class="no-results">No teachers found.</div>' : teachers.map(t => t.element).join('');
         }
 
-        // --- CORRECTED Discussion Hub Functions ---
-        const discussionRef = database.ref('discussions');
-        const messageInput = document.getElementById('message-input');
-        const sendMessageBtn = document.getElementById('send-message-btn');
-        const messagesContainer = document.getElementById('discussion-messages-container');
+        // Discussion Hub
+        function initializeDiscussionHub() {
+            const discussionRef = database.ref('discussions');
+            const messageInput = document.getElementById('message-input');
+            const sendMessageBtn = document.getElementById('send-message-btn');
+            const messagesContainer = document.getElementById('discussion-messages-container');
 
-        function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (messageText && currentUser) {
-                discussionRef.push({
-                    sender: currentUser.email.split('@')[0],
-                    senderId: currentUser.uid,
-                    text: messageText,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    edited: false
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText && currentUser) {
+                    discussionRef.push({
+                        sender: currentUser.email.split('@')[0],
+                        senderId: currentUser.uid,
+                        text: messageText,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        edited: false
+                    });
+                    messageInput.value = '';
+                }
+            }
+
+            function listenForMessages() {
+                messagesContainer.innerHTML = '';
+                const discussionQuery = discussionRef.orderByChild('timestamp').limitToLast(50);
+
+                discussionQuery.on('child_added', (snapshot) => {
+                    const message = snapshot.val();
+                    const messageKey = snapshot.key;
+                    displayMessage(message, messageKey);
+                    // Scroll to bottom after a short delay to ensure DOM is updated
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 100);
                 });
-                messageInput.value = '';
-            }
-        }
 
-        function listenForMessages() {
-            messagesContainer.innerHTML = ''; // Clear previous messages
-            const discussionQuery = discussionRef.limitToLast(50);
-
-            // 1. For new messages being added
-            discussionQuery.on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                const messageKey = snapshot.key;
-                displayMessage(message, messageKey);
-                // Auto-scroll to the bottom
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            });
-
-            // 2. For messages being changed (edited)
-            discussionQuery.on('child_changed', (snapshot) => {
-                const updatedMessage = snapshot.val();
-                const messageKey = snapshot.key;
-                const messageElement = document.getElementById(`message-${messageKey}`);
-                if (messageElement) {
-                    const textElement = messageElement.querySelector('.text');
-                    const timestampElement = messageElement.querySelector('.timestamp');
-                    
-                    if (textElement) textElement.textContent = updatedMessage.text;
-                    if (timestampElement) {
-                        const sentTime = new Date(updatedMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const editedBadge = updatedMessage.edited ? '<span class="edited-badge">(edited)</span>' : '';
-                        timestampElement.innerHTML = `${sentTime} ${editedBadge}`;
+                discussionQuery.on('child_changed', (snapshot) => {
+                    const updatedMessage = snapshot.val();
+                    const messageKey = snapshot.key;
+                    const messageElement = document.getElementById(`message-${messageKey}`);
+                    if (messageElement) {
+                        const textElement = messageElement.querySelector('.message-text');
+                        const timestampElement = messageElement.querySelector('.timestamp');
+                        
+                        if (textElement) textElement.textContent = updatedMessage.text;
+                        if (timestampElement) {
+                            const sentTime = new Date(updatedMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const editedBadge = updatedMessage.edited ? '<span class="edited-badge">(edited)</span>' : '';
+                            timestampElement.innerHTML = `${sentTime} ${editedBadge}`;
+                        }
                     }
-                }
-            });
+                });
 
-            // 3. For messages being removed
-            discussionQuery.on('child_removed', (snapshot) => {
-                const messageKey = snapshot.key;
-                const messageElement = document.getElementById(`message-${messageKey}`);
-                if (messageElement) {
-                    messageElement.remove();
-                }
-            });
-        }
-
-        function displayMessage(message, messageKey) {
-            // Avoid displaying null messages
-            if (!message) return;
-
-            const sentTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const isOwnMessage = message.senderId === currentUser.uid;
-            const messageClass = isOwnMessage ? 'message-bubble own-message' : 'message-bubble';
-            const editedBadge = message.edited ? '<span class="edited-badge">(edited)</span>' : '';
-            
-            const messageHTML = `
-                <div class="${messageClass}" id="message-${messageKey}">
-                    <div class="message-actions">
-                        <button class="message-options-btn" onclick="toggleMessageOptions('${messageKey}')">⋯</button>
-                        <div class="message-options-menu" id="options-${messageKey}">
-                            ${isOwnMessage ? `<div class="menu-item edit" onclick="startEditMessage('${messageKey}')"><span>✎ Edit</span></div>` : ''}
-                            ${(isOwnMessage || currentUserIsAdmin) ? `<div class="menu-item delete" onclick="confirmDeleteMessage('${messageKey}')"><span>🗑 Delete</span></div>` : ''}
-                        </div>
-                    </div>
-                    <div class="sender">${message.sender}</div>
-                    <div class="text" id="text-${messageKey}">${message.text}</div>
-                    <span class="timestamp">${sentTime} ${editedBadge}</span>
-                </div>
-            `;
-            
-            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-        }
-
-        window.editMessage = function(messageKey, newText) {
-            if (!newText.trim()) return;
-            database.ref(`discussions/${messageKey}`).update({
-                text: newText.trim(),
-                edited: true
-            }).catch(err => console.error("Message edit failed:", err));
-        }
-
-        window.deleteMessage = function(messageKey) {
-            database.ref(`discussions/${messageKey}`).remove()
-            .catch(err => console.error("Message delete failed:", err));
-        }
-
-        sendMessageBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => { 
-            if (e.key === 'Enter') sendMessage(); 
-        });
-
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (messageToDelete) {
-                deleteMessage(messageToDelete);
-                messageToDelete = null;
+                discussionQuery.on('child_removed', (snapshot) => {
+                    const messageKey = snapshot.key;
+                    const messageElement = document.getElementById(`message-${messageKey}`);
+                    if (messageElement) {
+                        messageElement.remove();
+                    }
+                });
             }
-            deleteConfirmationModal.classList.remove('show');
-        });
 
-        cancelDeleteBtn.addEventListener('click', () => {
-            messageToDelete = null;
-            deleteConfirmationModal.classList.remove('show');
-        });
-        
-        deleteConfirmationModal.addEventListener('click', (e) => {
-            if (e.target === deleteConfirmationModal) {
+            function displayMessage(message, messageKey) {
+                if (!message) return;
+
+                const sentTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const isOwnMessage = message.senderId === currentUser.uid;
+                const messageClass = isOwnMessage ? 'message-bubble own-message' : 'message-bubble';
+                const editedBadge = message.edited ? '<span class="edited-badge">(edited)</span>' : '';
+                
+                const messageHTML = `
+                    <div class="${messageClass}" id="message-${messageKey}">
+                        <div class="message-actions">
+                            <button class="message-options-btn" onclick="toggleMessageOptions('${messageKey}')">⋯</button>
+                            <div class="message-options-menu" id="options-${messageKey}">
+                                ${isOwnMessage ? `<div class="menu-item edit" onclick="startEditMessage('${messageKey}')"><span>✎ Edit</span></div>` : ''}
+                                ${(isOwnMessage || currentUserIsAdmin) ? `<div class="menu-item delete" onclick="confirmDeleteMessage('${messageKey}')"><span>🗑 Delete</span></div>` : ''}
+                            </div>
+                        </div>
+                        <div class="message-sender">${message.sender}</div>
+                        <div class="message-text" id="text-${messageKey}">${message.text}</div>
+                        <span class="timestamp">${sentTime} ${editedBadge}</span>
+                    </div>
+                `;
+                
+                messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            }
+
+            // Define global functions for message actions
+            window.editMessage = function(messageKey, newText) {
+                if (!newText.trim()) return;
+                database.ref(`discussions/${messageKey}`).update({
+                    text: newText.trim(),
+                    edited: true
+                }).catch(err => console.error("Message edit failed:", err));
+            }
+
+            window.deleteMessage = function(messageKey) {
+                database.ref(`discussions/${messageKey}`).remove()
+                .catch(err => console.error("Message delete failed:", err));
+            }
+
+            sendMessageBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') sendMessage(); 
+            });
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (messageToDelete) {
+                    window.deleteMessage(messageToDelete);
+                    messageToDelete = null;
+                }
+                deleteConfirmationModal.classList.remove('show');
+            });
+
+            cancelDeleteBtn.addEventListener('click', () => {
                 messageToDelete = null;
                 deleteConfirmationModal.classList.remove('show');
-            }
-        });
+            });
+            
+            deleteConfirmationModal.addEventListener('click', (e) => {
+                if (e.target === deleteConfirmationModal) {
+                    messageToDelete = null;
+                    deleteConfirmationModal.classList.remove('show');
+                }
+            });
 
-        populateNotices();
-        populateResources();
-        populateTeachers();
-        listenForMessages(); // Initialize the corrected message listener
+            listenForMessages();
+        }
     }
     
+    // --- Admin Modal Functions ---
     let currentEditing = { type: null, key: null };
 
     function openAdminModal(type, key = null, category = null) {
@@ -1367,7 +1499,10 @@ document.addEventListener('DOMContentLoaded', () => {
         adminModal.style.display = 'flex';
     }
 
-    function closeAdminModal() { adminModal.style.display = 'none'; }
+    function closeAdminModal() { 
+        adminModal.style.display = 'none'; 
+        currentEditing = { type: null, key: null };
+    }
 
     function saveAdminData() {
         const { type, key } = currentEditing;
@@ -1375,14 +1510,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataRef = database.ref(`${type}s`);
 
         if (type === 'notice') {
-            data = { title: document.getElementById('title-input').value.trim(), content: document.getElementById('content-input').value.trim(), date: new Date().toLocaleDateString('en-CA'), timestamp: firebase.database.ServerValue.TIMESTAMP, type: document.getElementById('notice-type-input').value };
-            if (!data.title || !data.content) { alert("Title and Content are required."); return; }
+            data = { 
+                title: document.getElementById('title-input').value.trim(), 
+                content: document.getElementById('content-input').value.trim(), 
+                date: new Date().toLocaleDateString('en-CA'), 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                type: document.getElementById('notice-type-input').value 
+            };
+            if (!data.title || !data.content) { 
+                alert("Title and Content are required."); 
+                return; 
+            }
         } else if (type === 'teacher') {
-            data = { name: document.getElementById('teacher-name').value.trim(), designation: document.getElementById('teacher-designation').value.trim(), email: document.getElementById('teacher-email').value.trim(), phone: document.getElementById('teacher-phone').value.trim(), img: document.getElementById('teacher-img').value.trim() };
-            if (!data.name || !data.designation) { alert("Name and Designation are required."); return; }
+            data = { 
+                name: document.getElementById('teacher-name').value.trim(), 
+                designation: document.getElementById('teacher-designation').value.trim(), 
+                email: document.getElementById('teacher-email').value.trim(), 
+                phone: document.getElementById('teacher-phone').value.trim(), 
+                img: document.getElementById('teacher-img').value.trim() 
+            };
+            if (!data.name || !data.designation) { 
+                alert("Name and Designation are required."); 
+                return; 
+            }
         } else if (type === 'resource') {
-            data = { title: document.getElementById('title-input').value.trim(), description: document.getElementById('description-input').value.trim(), url: document.getElementById('url-input').value.trim(), timestamp: firebase.database.ServerValue.TIMESTAMP };
-            if (!data.title || !data.url) { alert("Title and URL are required."); return; }
+            data = { 
+                title: document.getElementById('title-input').value.trim(), 
+                description: document.getElementById('description-input').value.trim(), 
+                url: document.getElementById('url-input').value.trim(), 
+                timestamp: firebase.database.ServerValue.TIMESTAMP 
+            };
+            if (!data.title || !data.url) { 
+                alert("Title and URL are required."); 
+                return; 
+            }
         }
 
         const promise = key ? dataRef.child(key).update(data) : dataRef.push(data);
@@ -1395,6 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Event delegation for admin buttons
     document.body.addEventListener('click', (e) => {
         const target = e.target.closest('.add-new-btn, .edit-btn, .delete-btn');
         if (!target) return;
@@ -1409,6 +1571,7 @@ document.addEventListener('DOMContentLoaded', () => {
     saveAdminDataBtn.addEventListener('click', saveAdminData);
     cancelAdminModalBtn.addEventListener('click', closeAdminModal);
     
+    // Update card click handler
     latestUpdatesContainer.addEventListener('click', (e) => {
         const card = e.target.closest('.update-card');
         if (!card) return;
@@ -1444,12 +1607,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.saveEditedMessage = function(messageKey) {
         const textElement = document.getElementById(`text-${messageKey}`);
         const textarea = textElement.querySelector('.edit-message-input');
-        editMessage(messageKey, textarea.value);
+        window.editMessage(messageKey, textarea.value);
     }
 
     window.cancelEditMessage = function(messageKey) {
         const textElement = document.getElementById(`text-${messageKey}`);
-        textElement.innerHTML = originalMessageText; // Restore from variable
+        textElement.innerHTML = originalMessageText;
     }
 
     window.confirmDeleteMessage = function(messageKey) {
