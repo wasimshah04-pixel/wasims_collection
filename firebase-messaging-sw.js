@@ -20,16 +20,20 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 // (Optional) ব্যাকগ্রাউন্ড নোটিফিকেশন হ্যান্ডেল করার জন্য
-messaging.onBackgroundMessage((payload) => {
+//... (উপরের অংশ যেমন আছে তেমনই থাকবে)
+
+// ব্যাকগ্রাউন্ড নোটিফিকেশন শোনার জন্য সঠিক পদ্ধতি
+messaging.setBackgroundMessageHandler(function(payload) {
   console.log(
-    "[firebase-messaging-sw.js] Received background message ",
+    '[firebase-messaging-sw.js] Received background message ', 
     payload
   );
+
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: "/icon.png", // আপনার আইকনের পাথ
+    icon: '/icon.png' // আপনার আইকনের পাথ
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
