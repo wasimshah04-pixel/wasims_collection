@@ -20,7 +20,7 @@
     <!-- END: FIREBASE SDK -->
 
     <style>
-        /* Your existing CSS code here... (কোনো পরিবর্তন নেই) */
+        /* Your existing CSS code here... */
         :root {
             --primary-color: #0d1b4c; --secondary-color: #3f51b5; --accent-color: #ffc107;
             --background-color: #f4f6f9; --text-color: #333; --light-text-color: #fff;
@@ -260,7 +260,6 @@
             margin-top: 5px;
         }
         
-        /* === START: CODE CORRECTION 1 === */
         .save-inline-edit-btn, .cancel-edit-btn {
             padding: 4px 8px;
             border: none;
@@ -273,7 +272,6 @@
             background: var(--primary-color);
             color: white;
         }
-        /* === END: CODE CORRECTION 1 === */
         
         .cancel-edit-btn {
             background: #ccc;
@@ -521,6 +519,41 @@
             align-items: center;
             gap: 10px;
         }
+
+        /* Custom Notification Styles */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Notification Enable Button */
+        .notification-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #enable-notifications-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #enable-notifications-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -565,6 +598,14 @@
                     <h2 id="user-greeting">Welcome!</h2>
                     <p>Your central hub for all academic updates.</p>
                 </div>
+                
+                <!-- Notification Enable Button -->
+                <div class="notification-section">
+                    <button id="enable-notifications-btn">
+                        🔔 Enable Notifications
+                    </button>
+                </div>
+
                 <h3 class="section-title">Latest Updates</h3>
                 <div class="latest-updates-container" id="latest-updates"></div>
                 <div class="dashboard-grid">
@@ -731,8 +772,128 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const auth = firebase.auth();
     const database = firebase.database();
-    // ADDED: Initialize Firebase Messaging
-    const messaging = firebase.messaging();
+    
+    // --- START: IMPROVED FCM NOTIFICATION LOGIC ---
+    let messaging = null;
+
+    function initializeFCM() {
+        try {
+            // Check if Firebase messaging is available
+            if (!firebase.messaging) {
+                console.error('Firebase Messaging is not available');
+                return;
+            }
+            
+            messaging = firebase.messaging();
+            
+            // Get the correct VAPID key from Firebase Console
+            const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
+            
+            // Request permission and get token
+            setupNotifications();
+            
+        } catch (error) {
+            console.error('FCM Initialization failed:', error);
+        }
+    }
+
+    function setupNotifications() {
+        if (!messaging) return;
+        
+        // Request permission and get token
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                return getFCMToken();
+            } else {
+                console.log('Unable to get permission to notify.');
+                return null;
+            }
+        }).then((token) => {
+            if (token && currentUser) {
+                // Save token to database
+                database.ref('fcm_tokens/' + currentUser.uid).set(token)
+                    .then(() => {
+                        console.log('FCM token saved to database');
+                        showCustomNotification({
+                            title: 'Notifications Enabled',
+                            body: 'You will now receive important updates!'
+                        });
+                    })
+                    .catch(err => console.error('Error saving FCM token:', err));
+            }
+        }).catch((err) => {
+            console.error('Error getting permission:', err);
+        });
+
+        // Handle foreground messages
+        messaging.onMessage((payload) => {
+            console.log('Foreground message received: ', payload);
+            showCustomNotification(payload.notification);
+        });
+    }
+
+    function getFCMToken() {
+        if (!messaging) return Promise.resolve(null);
+        
+        const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
+        
+        return messaging.getToken({ vapidKey: vapidKey })
+            .then((currentToken) => {
+                if (currentToken) {
+                    console.log('FCM Token:', currentToken);
+                    return currentToken;
+                } else {
+                    console.log('No registration token available.');
+                    return null;
+                }
+            })
+            .catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                return null;
+            });
+    }
+
+    function showCustomNotification(notification) {
+        if (!notification) return;
+        
+        // Create a custom in-app notification
+        const notificationElement = document.createElement('div');
+        notificationElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--accent-color);
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        notificationElement.innerHTML = `
+            <strong>${notification.title || 'New Update'}</strong>
+            <p style="margin: 5px 0 0 0; font-size: 0.9em;">${notification.body || ''}</p>
+        `;
+        
+        document.body.appendChild(notificationElement);
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+            if (notificationElement.parentNode) {
+                notificationElement.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notificationElement.parentNode) {
+                        notificationElement.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+    // --- END: IMPROVED FCM NOTIFICATION LOGIC ---
 
     const loginScreen = document.getElementById('login-screen');
     const appContainer = document.getElementById('app-container');
@@ -745,6 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const userGreeting = document.getElementById('user-greeting');
     const latestUpdatesContainer = document.getElementById('latest-updates');
+    const enableNotificationsBtn = document.getElementById('enable-notifications-btn');
     
     const adminModal = document.getElementById('admin-modal');
     const adminModalTitle = document.getElementById('admin-modal-title');
@@ -771,6 +933,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let allResources = [];
     let allTeachers = [];
 
+    // Notification enable button event
+    enableNotificationsBtn.addEventListener('click', () => {
+        setupNotifications();
+    });
+
     toggleFormBtn.addEventListener('click', () => {
         isLoginMode = !isLoginMode;
         formTitle.textContent = isLoginMode ? 'Login' : 'Sign Up';
@@ -796,45 +963,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(error => loginError.textContent = error.message);
         }
     });
-    
-    // --- START: NOTIFICATION LOGIC ---
-    function setupNotifications(user) {
-        // IMPORTANT: Replace with your VAPID key from Firebase Console
-        const vapidKey = "BBeTMFZQwiAh2ywTfgzuFddz7esCJt0Cq_cHWKZxSm72H_GMf7CAgiSrmJmSceTdCP3Jwa7QDWLVGdOGQFkwom8";
-        
-        messaging.getToken({ vapidKey: vapidKey }).then((currentToken) => {
-            if (currentToken) {
-                // Save the token to the database
-                console.log('FCM Token:', currentToken);
-                database.ref('fcm_tokens/' + user.uid).set(currentToken);
-            } else {
-                console.log('No registration token available. Request permission to generate one.');
-                requestNotificationPermission(user);
-            }
-        }).catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-        });
-    }
-
-    function requestNotificationPermission(user) {
-        console.log('Requesting permission...');
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-                setupNotifications(user);
-            } else {
-                console.log('Unable to get permission to notify.');
-            }
-        });
-    }
-
-    // Handle incoming messages when the app is in the foreground
-    messaging.onMessage((payload) => {
-        console.log('Message received. ', payload);
-        alert(`New Update:\n${payload.notification.title}`);
-    });
-    // --- END: NOTIFICATION LOGIC ---
-
 
     logoutBtn.addEventListener('click', () => {
         // Remove the user's token on logout
@@ -852,9 +980,11 @@ document.addEventListener('DOMContentLoaded', () => {
             userGreeting.textContent = `Welcome, ${user.email.split('@')[0]}`;
             currentUser = user;
             
-            // ADDED: Setup notifications on login
-            requestNotificationPermission(user);
-
+            // Initialize FCM after user login
+            setTimeout(() => {
+                initializeFCM();
+            }, 1000);
+            
             database.ref(`admins/${user.uid}`).once('value', snapshot => {
                 currentUserIsAdmin = snapshot.exists();
                 toggleAdminUI(currentUserIsAdmin);
@@ -1307,9 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.startEditMessage = function(messageKey) {
         const textElement = document.getElementById(`text-${messageKey}`);
         originalMessageText = textElement.textContent;
-        // === START: CODE CORRECTION 2 ===
         textElement.innerHTML = `<textarea class="edit-message-input">${originalMessageText}</textarea><div class="edit-actions"><button class="save-inline-edit-btn" onclick="saveEditedMessage('${messageKey}')">Save</button><button class="cancel-edit-btn" onclick="cancelEditMessage('${messageKey}')">Cancel</button></div>`;
-        // === END: CODE CORRECTION 2 ===
         document.getElementById(`options-${messageKey}`)?.classList.remove('show');
     }
 
@@ -1340,4 +1468,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-                    </html>
+</html>
